@@ -1,80 +1,650 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+HOST: https://www.stratus5.com/s5Api/v1
 
-# testapi
+# S5 API
+This is the principal Stratus5 API and the intention is for this API to  enable you to programmatically carry out the same functions
+you can do as an admin of your Stratus5 account. Currently it only provides a subset of the features
+but will grow over time.
 
-Polls is a simple API allowing consumers to view polls and vote in them.
 
-## Questions Collection [/questions]
+# Group Authentication
+In order to make requests to this api, you must authenticate via HTTP Basic Auth with the username and password
+of an admin account. In order to avoid credentials being inadvertantly updated we recommend creating a separate admin account in order to
+make api requests with.
+        
 
-### List All Questions [GET]
+## Group Packages
+
+A package resource has the following attributes:
+
+| Attribute         | Description                                                                                                         |
+| :---------------- | :------------------------------------------------------------------------------------------------------------------ |
+| id                | Unique identifier.                                                                                                  |
+| name              | Name of the app package                                                                                             |
+| createdAt         | Date resource was first created                                                                                     |
+| updatedAt         | Date resource was last updated                                                                                      |
+
+          
+## List of Packages  [/packages]
+
+Get a list of all packages
+
+### Get Packages [GET]
 
 + Response 200 (application/json)
 
         [
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
+                id: "ff8081815148ce01015148d21e370003",
+                name: "Wordpess",
+                createdAt: "2013-01-01T01:01:01",
+                updatedAt: "2013-01-01T01:01:01"
             }
         ]
+        
+        
+##  GET a particular package [/packages/{id}]
 
-### Create a New Question [POST]
++ Parameters
 
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+    + id (uid, `ff8081815148ce01015148d21e370003`) ... An unique identifier of the package.
+
+### Retrieve Package [GET]
+
++ Response 200 (application/json)
+
+        {
+            id: "ff8081815148ce01015148d21e370003",
+            name: "Wordpess",
+            createdAt: "2013-01-01T01:01:01",
+            updatedAt: "2013-01-01T01:01:01"
+        }
+
+
+## Group Customers
+
+A customer resource has the following attributes:
+
+| Attribute               | Description                                                                                                  |
+| :---------------------- | :------------------------------------------------------------------------------------------------------------|
+| id                      | Unique identifier.                                                                                           |
+| firstName               | Customer's first name                                                                                        |
+| lastName                | Customer's last name                                                                                         |
+| email                   | Customer's email (is used as login name)                                                                     |
+| password                | password                                                                                                     |
+| orgName                 | Organization name                                                                                            |
+| taxIdentificationNumber | Tax identification number                                                                                    |
+| tel                     | Customer's telephone number                                                                                  |
+| address                 | Nested address Object (optional)                                                                             |
+
+
+The optional `address` object can have the following attributes:
+
+| Attribute    | Details                  | Description                                             |
+| :----------- | :----------------------- | :------------------------------------------------------ | 
+| addressLine1 | Max 255 Chars            | House number and street address                         |
+| addressLine2 | Max 255 Chars. Optional. | If address requires additional line                     |
+| city         | Max 255 Chars            | City or town                                            |
+| zip          | Max 255 Chars            | Zip or postal code                                      |
+| county       | Max 255 Chars. Optional. | County/State/Region                                     |
+| country      | 2 Chars                  | Alpha2 code for the relevant country, e.g. IN for India |
+
+
+## All customers [/customers]
+Collection of all customers 
+
+### List All Customers [GET]
+
++ Response 200
+
+        [
+            {
+                "id": "ff8080815bd38ec2015bd3c260e20000",
+                "orgName": "org1",
+                "tel": null,
+                "email": "org1@myemail.com",
+                "firstName": "Danny",
+                "lastName": "DeVito",
+                "taxIdentificationNumber": null,
+                "paymentMethod": null,
+                "createdAt": "2017-05-04T13:59:43.000Z",
+                "address": null
+            },
+            {
+                "id": "ff8080815baf4aef015baf52022e0000",
+                "orgName": "org2",
+                "tel": "1234567",
+                "email": "myemail@myemail.com",
+                "firstName": "Tom",
+                "lastName": "Hanks",
+                "taxIdentificationNumber": null,
+                "paymentMethod": null,
+                "createdAt": "2017-04-27T12:10:38.000Z",
+                "address": null
+            }
+        ]    
+        
+## Get a particular customer [/customers/{id}]
+
++ Parameters
+
+    + id (uid, `ff8080815bd38ec2015bd3c260e20000`) ... An unique identifier of the site.
+    
+### Retrieve Customer [GET]
+
++ Response 200 (application/json)        
+
+        {
+            "id": "ff8080815bd38ec2015bd3c260e20000",
+            "orgName": "org1",
+            "tel": null,
+            "email": "org1@myemail.com",
+            "firstName": "Danny",
+            "lastName": "DeVito",
+            "taxIdentificationNumber": null,
+            "paymentMethod": null,
+            "createdAt": "2017-05-04T13:59:43.000Z",
+            "address": null
+        }        
+        
+
+### Create Customer [POST]
 
 + Request (application/json)
 
         {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
+            "orgName": "org1",
+            "email": "org1@myemail.com",
+            "firstName": "Danny",
+            "lastName": "DeVito"
         }
 
 + Response 201 (application/json)
 
-    + Headers
+        {
+            "id": "ff8080815bd38ec2015bd3c260e20000",
+            "orgName": "org1",
+            "tel": null,
+            "email": "org1@myemail.com",
+            "firstName": "Danny",
+            "lastName": "DeVito",
+            "taxIdentificationNumber": null,
+            "paymentMethod": null,
+            "createdAt": "2017-05-04T13:59:43.000Z",
+            "address": null
+        }        
 
-            Location: /questions/2
+
+## Update a customer [/customers/{id}]
+
++ Parameters
+
+    + id (uid, `ff8080815bd38ec2015bd3c260e20000`) ... An unique identifier of the site.
+    
+### Update Customer [PUT]
+
+Updates the customer by setting the values of the parameters passed. Any parameters not provided will be left unchanged. 
+For example, if you pass the `orgName`, that becomes the customer's organisational name. You can update the following attributes of a customer:
+
+| Attributes                | Description                                                                                                                                      |
+| :------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| orgName                   | The organisational name of the customer.                                                                                                         |
+| email                     | The email address of the customer.                                                                                                               |             
+| firstName                 | The first name of the customer                                                                                                                   |
+| lastName                  | The last name of the customer                                                                                                                    |
+| tel                       | The telephone number of the customer                                                                                                             |
+| taxIdentificationNumber   | Customer VAT number                                                                                                                              |
+| address                   | Nested address object                                                                                                                            |
+
+The nested `address` object can have the following attributes
+
+| Attributes        | Description                                                                                                                                      |
+| :---------------- | :------------------------------------------------------ |
+| addressLine1      | House number and street address                         |
+| addressLine2      | If address requires additional line                     |
+| city              | City                                                    |
+| zip               | Zip or postal code                                      |
+| county            | County/State/Region                                     |
+| country           | Alpha2 code for the relevant country, e.g. IN for India |
+
++ Request Update Customer (application/json)
+
+    + Body
+    
+            {
+                "orgName": "My New Company",
+                "firstName":"newFirstName", 
+                "lastName":"newLastName", 
+                "tel":"newTel", 
+                "taxIdentificationNumber": "newTaxIdentificationNumber"
+            }
+
++ Response 200 (application/json)
 
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+                "id": "ff8080815bd38ec2015bd3c260e20000",
+                "orgName": "My New Company",
+                "tel": "newTel",
+                "email": "org1@myemail.com",
+                "firstName": "newFirstName",
+                "lastName": "newLastName",
+                "taxIdentificationNumber": "newTaxIdentificationNumber",
+                "paymentMethod": null,
+                "createdAt": "2017-05-04T13:59:43.000Z",
+                "address": null
+            }        
+        
+        
+## Delete a customer [/customers/{id}]
+
++ Parameters
+
+    + id (uid, `ff8080815bd38ec2015bd3c260e20000`) ... An unique identifier of the site.
+    
+### Delete Customer [DELETE]
+        
++ Response 200 (application/json)
+        
+        
+## Group Sites
+
+A site resource has the following attributes:
+
+| Attribute              | Description                                                                                                                |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| id                     | Unique identifier.                                                                                                         |
+| uri                    | Unique uri that represents the site                                                                                        |
+| status                 | The status of the site (see table Site states below)                                                                       |
+| zone                   | The location of the site. Stratus5 operates server clusters in both the EU and the US                                      |
+| description            | Attribute for holding a description for our side, for example it be customer name and/or customer email. 
+| containerMemory        | Memory allocation of site container                                                                                     |
+| containerSshPort       | Port to ssh to container if your container is running ssh                                                               |
+| containerSshUsername   | Username to ssh to container if your container is running ssh                                                           |
+| containerSshPassword   | Password to ssh to container if your container is running ssh                                                           |
+| containerHostIpAddress | Ip Address of the host the container is running on                                                                    |
+| deployedAt             | Date when site last deployed                                                                                               |
+| createdAt              | Date resource was first created                                                                                            |
+| updatedAt              | Date resource was last updated                                                                                             |
+
+Site States
+| State              | Description                                                                                                                |
+| :----------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| Not Deployed       | The site has been defined but not yet deployed. Possible actions in this state: deploy.                                    |
+| Deploying          | The container, database, DNS are being installed and configured. No actions allowed in this state.                         |
+| Running            | All services for the site are deployed and running. Possible actions in this state: stop, redeploy, undeploy.              |
+| Stopping           | All services for the site are either stopping or already stopped. No actions allowed in this state.                        |
+| Stopped            | All services for the site are stopped. Possible actions in this state: start, redeploy, terminate.                         |
+| Undeploying        | All services for the site are either being terminated or already terminated. No actions allowed in this state.             |
+| Undeployed         | The site and all its services have been terminated. Possible actions in this state: redeploy.                              |
+
+            
+## All sites [/sites]
+Collection of all sites 
+
+### List All Sites [GET]
+
++ Response 200
+
+        [
+            {
+                "id": "ff8081815148ce01015148d21e370003",
+                "url": "https://mysite-myservice.stratus5.net",
+                "state": "Running",
+                "deployedAt": "2013-01-01T01:01:01",
+                "createdAt": "2013-01-01T01:01:01"
             }
+        ]
+
+### Create Site [POST]
+
+
++ Request (application/json)
+
+        {
+            "domain": "mysite-myservice.stratus5.net",
+            "package": "dd2323ljkklj3ce01015148d21e370003",
+            "containerMemory": 2048,
+            "username": "myuser",
+            "password": "MyPass123",
+            "description": "mysite : admin@mysite.com"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "ff8081815148ce01015148d21e370003",
+            "uri": "https://mysite-myservice.stratus5.net"
+            "status": "Not Deployed",
+            "containerMemory": 2048,
+            "zone": "EU",
+            "createdAt": "2014-01-01T07:00:00Z",
+            "updatedAt": "2014-01-01T07:00:00Z"
+        }
+
+### Create Site for existing customer [POST]
+
++ Request (application/json)
+
+        {
+            "domain": "mysite-myservice.stratus5.net",
+            "package": "dd2323ljkklj3ce01015148d21e370003",
+            "customerId" : "ff8080815bd38ec2015bd3c260e20000"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "ff8081815148ce01015148d21e370003",
+            "uri": "https://mysite-myservice.stratus5.net"
+            "status": "Not Deployed",
+            "containerMemory": 2048,
+            "zone": "EU",
+            "createdAt": "2014-01-01T07:00:00Z",
+            "updatedAt": "2014-01-01T07:00:00Z"
+        }
+
+
+## Get a particular site [/sites/{id}]
+
++ Parameters
+
+    + id (uid, `ff8081815148ce01015148d21e370003`) ... An unique identifier of the site.
+    
+### Retrieve Site [GET]
+
++ Response 200 (application/json)
+    
+    + Body
+        
+            {
+                "id": "ff8081815148ce01015148d21e370003",
+                "url": "https://mysite-myservice.stratus5.net",
+                "state": "Running",
+                "zone": "EU",
+                "containerMemory": 2048,
+                "containerSshPort": 34,
+                "containerSshUsername": "asdfljk",
+                "containerSshPassword": "a2l3kj£akj3nj4n",
+                "containerHostIpAddress": "122.333.44.55"
+            }
+            
+## Restart [/sites/{id}/restart]
+
++ Parameters
+
+    + id (number, `1`) ... An unique identifier of the site.
+    
+### Restart Site [POST]
+
++ Response 200 (application/json)
+
+    + Body
+    
+                {
+                    id: "ff8081815148ce01015148d21e370003",
+                    url: "https://mysite-myservice.stratus5.net",
+                    state: "Stopping"
+                }
+                
+<!--
+## Redeploy [/sites/{id}/redeploy]
+
++ Parameters
+
+    + id (string, `ff8081815148ce01015148d21e370003`) ... A unique identifier of the site.
+    
+### Redeploy Site [POST]
+
++ Response 200 (application/json)
+
+    + Body
+    
+                {
+                    id: "ff8081815148ce01015148d21e370003",
+                    url: "https://mysite-myservice.stratus5.net",
+                    state: "Starting"
+                }
+            
+-->                
+## Start [/sites/{id}/start]
+
++ Parameters
+
+    + id (string, `ff8081815148ce01015148d21e370003`) ... A unique identifier of the site.
+    
+### Start Site [POST]
+
++ Response 200 (application/json)
+
+    + Body
+    
+                {
+                    id: "ff8081815148ce01015148d21e370003",
+                    url: "https://mysite-myservice.stratus5.net",
+                    state: "Starting"
+                }
+            
+## Stop [/sites/{id}/stop]
+
++ Parameters
+
+    + id (string, `ff8081815148ce01015148d21e370003`) ... An unique identifier of the site.
+    
+### Stop Site [POST]
+
++ Response 200 (application/json)
+
+    + Body
+    
+                {
+                    id: "ff8081815148ce01015148d21e370003",
+                    url: "https://mysite-myservice.stratus5.net",
+                    state: "Starting"
+                }
+            
+## Undeploy [/sites/{id}/undeploy]
+
++ Parameters
+
+    + id (string, `ff8081815148ce01015148d21e370003`) ... An unique identifier of the site.
+    
+### Undeploy Site [POST]
+
++ Response 200 (application/json)
+
+    + Body
+    
+                {
+                    id: "ff8081815148ce01015148d21e370003",
+                    url: "https://mysite-myservice.stratus5.net",
+                    state: "Undeploying"
+                }
+            
+
+# Group Routes
+
+A route resource has the following attributes:
+
+| Attribute              | Description                                                                                                                |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| id                     | Unique identifier.                                                                                                         |
+| path                   | The domain to route requests to this site                                                                                  |
+| sslCert                | Will be true if a SSL Certificate has been added for this domain, otherwise false.                                         |
+
+## Routes [/site/{siteId}/routes/{id}]
+A route defines a way to access a particular site. 
+
++ Parameters
+
+    + id (number, `1`) ... An unique identifier of the route.
+    + siteId (string, `alkjl3jlj23lkjlkj`) ... A unique identifier of the site 
+
+### Retrieve Route [GET]
+
++ Response 200 (application/json)
+    
+    + Body
+        
+            {
+                "created_at": "2014-01-01T07:00:00Z",
+                "updated_at": "2014-01-01T07:00:00Z",
+                "id": 23,
+                "path": "example.com",
+                "sslCert": false
+            }
+
+### Delete a Route [DELETE]
+Deletion is irreversible, and it may impact on the accessibility of the site to the outside world.
+
++ Response 200
+
+## SSL Cert [/sites/{siteId}/routes/{id}/sslCert]
+
+Where validation of the cert fails, one of the following error codes will be returned.
+
+| Error Code                        | Error Description                                                                 |
+| :-------------------------------- | :-------------------------------------------------------------------------------- |
+| PRIMARY_CERT_REQUIRED             | Primary certificate is required.                                                  |
+| PRIMARY_CERT_INVALID              | Primary certificate is invalid.                                                   |
+| PRIMARY_CERT_EXPIRED              | Primary certificate is expired.                                                   |
+| PRIMARY_CERT_NOT_YET_VALID        | Primary certificate is not yet valid.                                             |
+| PRIVATE_KEY_REQUIRED              | Private key is required.                                                          |
+| PRIVATE_KEY_INVALID               | Private key is invalid.                                                           |
+| PRIMARY_CERT_PRIVATE_KEY_CONFLICT | The private key is not the correct private key for the primary cert provided.     |
+| CHAIN_CERT_INVALID                | The chain certificate is invalid.                                                 |
+| CHAIN_CERT_PRIMARY_CERT_CONFLICT  | The chain certificate is not the chain certificate for the primary cert provided  |
+
+### Replace or Add SSL Cert to Route [POST]
+
++ Request (application/json)
+
+        {
+        "primaryCert": ["-----BEGIN CERTIFICATE-----",
+                    "MIIDtTCCAp2gAwIBAgIJAPJeMTcvalfPMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV",
+                    "BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX",
+                    "aWRnaXRzIFB0eSBMdGQwHhcNMTUxMDA4MTMzMTU0WhcNMTgwNzA0MTMzMTU0WjBF",
+                    "MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50",
+                    "ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB",
+                    "CgKCAQEAu5Yqp3dEq7dv+ua23CROTIXxIAH9A41Ycy7k/Fnu6ZFRuLmftt96qgRS",
+                    "zNlI/AgtwMcAFd/Yw/z97oFcccihPK7P1JuwXsrvQxmtz5ZVvnN/uF2z+l9HexLe",
+                    "ouOQ9m9zpeGqGZBSDCRNk7XsA8xgPM5GUvD1BFFVRNwjNfcqMvgYYVkE+84mh8tO",
+                    "KDAyDee5+UUQD1Qn3ByMNCWy6mRbaPG2IX4KpycPRD9VFkl9QuOSXnHu7SvJ7de1",
+                    "qB6bCHEPEnrjQq/sbeQ5hdj95DHgvak1dU9Gb7oW+sZuHoSLNH22Mzl9uvo7ojrY",
+                    "V5QcbFt9C0NoFuMQYInM/YJvRzxmzwIDAQABo4GnMIGkMB0GA1UdDgQWBBTKb7SS",
+                    "25TS8bUzR5kGiQ1SJMOeMDB1BgNVHSMEbjBsgBTKb7SS25TS8bUzR5kGiQ1SJMOe",
+                    "MKFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNV",
+                    "BAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAPJeMTcvalfPMAwGA1UdEwQF",
+                    "MAMBAf8wDQYJKoZIhvcNAQEFBQADggEBABt4wn9A8DFCcdg0OiZVxajekM8H/esn",
+                    "KYlypAG/M1oxb7P3WY+98EXdwUS/Wfe8uk8Ox7vustouBidO/J5Hk82qUtUO++TN",
+                    "1BtNMBszJ3l0QY/JDEWIIe56E5fLlieZXDmrv2dxGV/l1JdV//NB45bBFriNycUQ",
+                    "o34RkqTj0m9ILmonDDNpoEks0Y6mUcklKIDNSLzyiHKzlvBg8Ad30ONexcAO7I0I",
+                    "tdd0SO8qQybpWgrsLVzA1oTp8QU1jTKvpr1xJ6YAcVXfAbIInAsEg4Nqql/nVhVO",
+                    "00Fzt3Uc/B413RkVR6lY5ZVF85yGuQohoquPTdmUNWEn4SABKlOtNNs=",
+                    "-----END CERTIFICATE-----  "],
+        "privateKey": ["-----BEGIN RSA PRIVATE KEY-----",
+                    "MIIEowIBAAKCAQEAu5Yqp3dEq7dv+ua23CROTIXxIAH9A41Ycy7k/Fnu6ZFRuLmf",
+                    "tt96qgRSzNlI/AgtwMcAFd/Yw/z97oFcccihPK7P1JuwXsrvQxmtz5ZVvnN/uF2z",
+                    "+l9HexLeouOQ9m9zpeGqGZBSDCRNk7XsA8xgPM5GUvD1BFFVRNwjNfcqMvgYYVkE",
+                    "+84mh8tOKDAyDee5+UUQD1Qn3ByMNCWy6mRbaPG2IX4KpycPRD9VFkl9QuOSXnHu",
+                    "7SvJ7de1qB6bCHEPEnrjQq/sbeQ5hdj95DHgvak1dU9Gb7oW+sZuHoSLNH22Mzl9",
+                    "uvo7ojrYV5QcbFt9C0NoFuMQYInM/YJvRzxmzwIDAQABAoIBACc0dkuzyJ1e5D96",
+                    "8qLFz7t8ju2SnM+ePess1NzM6vrTzVGfMfslb9yStL9tdix+hRlyPdlUhFhJysSL",
+                    "MsfxF4m4O2WC+HSHU0Qh3Mqy786zEvF0XAYq3aSiR/ehOg3XM0NrC4L2P7+b4r7J",
+                    "Wb9deouazOXOyFaTrQ+MNquzsZUfG1eQOZVYK5ciYwigyD+rO37V5I/PR3aCXXCy",
+                    "Y/Aoay1Auo/AOEWxmGJnis7Jn+4BTCHmmuD/doii5uit80hUiNPFdxTZhzlY8ANn",
+                    "+ljrF+wxSAJV102Lm+oKWi+0ropEcFnBAgRu+8k/C/NHWiFWLzLvOL/Psw7SmyMf",
+                    "xJgJTPECgYEA29cORLHrWVQ9nUc2hILOW23K9nO5c98C6VL6jdkexDTPfnEcic3k",
+                    "+DS5Uze7JFiY5TEVj6JTDVkN/UrsFBf4EsZ/jBb0HUeZOIyvc9bWlp1N9S9IZXEW",
+                    "neJJpU8aouZjagG1/tg2qIIultL84nqOU1iAQqfStiZbN/K++Q5iO/cCgYEA2nD+",
+                    "V75ZbfzY/Z7fFYI2VgodWgnhLcczZG8y3uTlAxIxqLy4cyZ9F/n5mjUL24K+XcvN",
+                    "gh6jSpZxeTLsNxbnMudnfCJbwjypg3ZGWHNEIqW1F1lfwfYxNgqrni09uBqcjpPW",
+                    "EsX2WhjWKanCiuqZjJYHDcCxw3/iU6su+SaYBekCgYAW229SWSVdLlMRrTvP30HR",
+                    "Y8L8iN+5WnCVDdmbMf3u7Ia+YMhU06GA5Qp3yo2co9GR0t6pBnmYI7A+q7GMDUnv",
+                    "uc+9Iw3SlYUqygXcB3RcSJK4cWgXlACD/ekmVOkyEr43YWIo0xYrww1RBTLh4Vg2",
+                    "9javt39DDQ3i7UxJ3OL91QKBgQCnfrTH+wD/wT1xW3ybNXkMiDzxaVnsjC3v+QP8",
+                    "vW6M6EqDpBGa2gxZcifeAobRDnOB4F/4Qh3bd3gTAuT1aO5mreE/4eiSC4m/b9WI",
+                    "xPmdx4oQGUu/olMhqRTm+LG2lVEuUlV3l6vKcfjlgXHWqwSKNA+8j+C+kzSsCzq9",
+                    "eMZg4QKBgGelBVNRE+gP0+py5jCXwEqhN4O4ZiWsohS1mz92mioFKwhgAgapK/le",
+                    "hHvpN1T+Tf/XShOcrOwHmoywdLFM0f9OwRSAxxxInhJt9GJDEnsUUSnsH17uWnhD",
+                    "doxkfYBthUchoGwPZp/EKvWuGTNcmC6Nu0WTU0CuZ0ltRG3KPPlK",
+                    "-----END RSA PRIVATE KEY-----"],
+        "chainCert": ["-----BEGIN CERTIFICATE-----",
+                    "MIIDtTCCAp2gAwIBAgIJAPJeMTcvalfPMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV",
+                    "BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX",
+                    "aWRnaXRzIFB0eSBMdGQwHhcNMTUxMDA4MTMzMTU0WhcNMTgwNzA0MTMzMTU0WjBF",
+                    "MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50",
+                    "ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB",
+                    "CgKCAQEAu5Yqp3dEq7dv+ua23CROTIXxIAH9A41Ycy7k/Fnu6ZFRuLmftt96qgRS",
+                    "zNlI/AgtwMcAFd/Yw/z97oFcccihPK7P1JuwXsrvQxmtz5ZVvnN/uF2z+l9HexLe",
+                    "ouOQ9m9zpeGqGZBSDCRNk7XsA8xgPM5GUvD1BFFVRNwjNfcqMvgYYVkE+84mh8tO",
+                    "KDAyDee5+UUQD1Qn3ByMNCWy6mRbaPG2IX4KpycPRD9VFkl9QuOSXnHu7SvJ7de1",
+                    "qB6bCHEPEnrjQq/sbeQ5hdj95DHgvak1dU9Gb7oW+sZuHoSLNH22Mzl9uvo7ojrY",
+                    "V5QcbFt9C0NoFuMQYInM/YJvRzxmzwIDAQABo4GnMIGkMB0GA1UdDgQWBBTKb7SS",
+                    "25TS8bUzR5kGiQ1SJMOeMDB1BgNVHSMEbjBsgBTKb7SS25TS8bUzR5kGiQ1SJMOe",
+                    "MKFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNV",
+                    "BAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAPJeMTcvalfPMAwGA1UdEwQF",
+                    "MAMBAf8wDQYJKoZIhvcNAQEFBQADggEBABt4wn9A8DFCcdg0OiZVxajekM8H/esn",
+                    "KYlypAG/M1oxb7P3WY+98EXdwUS/Wfe8uk8Ox7vustouBidO/J5Hk82qUtUO++TN",
+                    "1BtNMBszJ3l0QY/JDEWIIe56E5fLlieZXDmrv2dxGV/l1JdV//NB45bBFriNycUQ",
+                    "o34RkqTj0m9ILmonDDNpoEks0Y6mUcklKIDNSLzyiHKzlvBg8Ad30ONexcAO7I0I",
+                    "tdd0SO8qQybpWgrsLVzA1oTp8QU1jTKvpr1xJ6YAcVXfAbIInAsEg4Nqql/nVhVO",
+                    "00Fzt3Uc/B413RkVR6lY5ZVF85yGuQohoquPTdmUNWEn4SABKlOtNNs=",
+                    "-----END CERTIFICATE-----  "]
+        }
+
++ Response 201 
+
++ Response 400 (application/json)
+
+        {
+        
+            "errorCode": "PRIMARY_CERT_INVALID",
+            "errorDescription": "Primary Cert Invalid"
+        
+        }
+
+
+## Routes Collection [/sites/{siteId}/routes]
+Collection of all routes.
+
++ Model (application/json)
+
+    + Body
+
+            [
+                {
+                    "created_at": "2014-01-01T07:00:00Z",
+                    "updated_at": "2014-01-01T07:00:00Z",
+                    "id": 23,
+                    "path": "example.com",
+                    "sslCert": false
+                }
+            ]
+        
+### List All Routes [GET]
+
++ Response 200
+
+    [Routes Collection][]
+
+### Create a Route [POST]
+To create a new route.
+
++ Request (application/json)
+
+        {
+            "path": "example.com"
+        }
+        
+
++ Response 201 (application/json)
+
+        {
+            "created_at": "2014-01-01T07:00:00Z",
+            "updated_at": "2014-01-01T07:00:00Z",
+            "id": 23,
+            "path": "example.com",
+            "sslCert": false
+        }
